@@ -1,28 +1,39 @@
-# Use the php:8.2-apache image as base
-FROM php:8.2-apache
+# Use the base image with PHP and other necessary configurations
+FROM docker.io/library/php:8.1-fpm
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /var/www/html
 
-# Copy Laravel files into the container
-COPY framework_files/app_files/ ./
+# Copy the application files into the container
+COPY app_files /var/www/html
 
-# Install dependencies and enable necessary extensions if needed
-# For Laravel, you may need to install additional PHP extensions or packages.
-# For example, if you're using MySQL, you might need to install the pdo_mysql extension.
-# RUN docker-php-ext-install pdo_mysql
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    curl \
+    git \
+    unzip
 
-# Set permissions if needed
-RUN chown -R www-data:www-data storage bootstrap
-
-# Install composer if not already installed
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install PHP dependencies using Composer
+# Copy .env.example and rename it to .env
+RUN cp .env.example .env
+
+# Run Composer commands
 RUN composer install --no-scripts --no-autoloader
+RUN composer dump-autoload
 
-# Expose port 80 (default for Apache)
-EXPOSE 80
+# Clear cache and configuration
+RUN php artisan cache:clear
+RUN php artisan config:clear
 
-# Start Apache server
-CMD ["apache2-foreground"]
+# Generate the application key
+RUN php artisan key:generate
+
+# Expose port 8080
+EXPOSE 8080
+
+# Start the Laravel application on port 8080
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
