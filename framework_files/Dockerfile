@@ -25,20 +25,20 @@ COPY app_files/ /var/www/html/
 RUN cp .env.example .env
 
 # Run Composer commands
-RUN composer install --no-scripts --no-autoloader
-RUN composer dump-autoload
+RUN composer install --no-scripts --no-autoloader \
+    && composer dump-autoload
 
 # Clear cache and configuration
-RUN php artisan cache:clear
-RUN php artisan config:clear
+RUN php artisan cache:clear \
+    && php artisan config:clear
 
 # Generate the application key
 RUN php artisan key:generate
 
 # Configure Apache within the Dockerfile
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.co>
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Give appropriate permissions to Laravel directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
