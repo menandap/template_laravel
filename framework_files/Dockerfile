@@ -14,13 +14,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
-<<<<<<< Updated upstream
     && docker-php-ext-install mysqli pdo_mysql
-=======
-    && docker-php-ext-install mysqli pdo_mysql \
-    && docker-php-ext-configure zip \
-    && docker-php-ext-install zip
->>>>>>> Stashed changes
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -35,9 +29,8 @@ RUN cp .env.example .env
 RUN composer install --no-scripts --no-autoloader \
     && composer dump-autoload
 
-# Clear cache and configuration
-RUN php artisan cache:clear \
-    && php artisan config:clear
+# Clear cache and configuration (if applicable to Laravel 11)
+RUN php artisan optimize:clear
 
 # Generate the application key
 RUN php artisan key:generate
@@ -54,8 +47,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 80
 
 # Start Apache
-<<<<<<< Updated upstream
 CMD ["apache2-foreground"]
-=======
-CMD ["apache2-foreground"]
->>>>>>> Stashed changes
