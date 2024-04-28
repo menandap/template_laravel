@@ -14,7 +14,13 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
+<<<<<<< Updated upstream
     && docker-php-ext-install mysqli pdo_mysql
+=======
+    && docker-php-ext-install mysqli pdo_mysql \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip
+>>>>>>> Stashed changes
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -48,4 +54,8 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 80
 
 # Start Apache
+<<<<<<< Updated upstream
 CMD ["apache2-foreground"]
+=======
+CMD ["apache2-foreground"]
+>>>>>>> Stashed changes
